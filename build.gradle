@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'org.example'
-version '1.0.4-SNAPSHOT-'+new Date().format("yyyyMMddHHmmss")
+version '1.0.1-SNAPSHOT-'+new Date().format("yyyyMMddHHmmss")
 
 
 // 각종 의존성들을 어떤 원격 저장소에서 받을 지 결정
