@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/ec2-user/app/step2/zip/
+    destination: /home/ec2-user/app/step3/zip/
     overwrite: yes
 
 permissions:
@@ -12,7 +12,22 @@ permissions:
     group: ec2-user
 
 hooks:
-  ApplicationStart:
-    - location: deploy.sh
+  AfterInstall:
+    - location: stop.sh   # nginx와 연결되어 있지 않은 springboot server를 종료합니다.
       timeout: 60
       runas: ec2-user
+  ApplicationStart:
+    - location: start.sh  # nginx와 연결되어 있지 않은 Port로 새 버전의 springboot server를 시작합니다.
+      timeout: 60
+      runas: ec2-user
+  ValidateService:
+    - location: health.sh # 새 springboot server가 정상적으로 실행됐는 지 확인합니다.
+      timeout: 60
+      runas: ec2-user
+
+#무중단 배포를 진행할 5가지 스크립트
+#- stop.sh : 기존 nginx에 연결되어 있진 않지만, 실행 중이던 스프링 부트 종료
+#- start.sh : 배포할 신규 버전 스프링 부트 프로젝트를 stop.sh로 종료한 'profile'로 실행
+#- health.sh : 'start.sh'로 실행시킨 프로젝트가 정상적으로 실행됐는지 체크
+#- switch.sh : nginx가 바라보는 스프링 부트를 최신 버전으로 변경
+#- profile.sh : 앞선 4개 스크립트 파일에서 공용으로 사용할 'profile'과 포트 체크 로직
